@@ -30,21 +30,44 @@ impl Forth {
 
     pub fn eval(&mut self, input: &str) -> ForthResult {
         let mut found_open = false;
-        let mut found_word = Vec::new();
+        let mut found_word: Vec<String> = Vec::new();
+        let mut found_def: Vec<String> = Vec::new();
 
-        println!("defs: {:?}", self.word_defs);
+        let mut ops: Vec<String> = Vec::new();
 
-        for op in input.to_lowercase().split(|c: char| !c.is_alphanumeric() && c != '+' && c != '-' && c != '*' && c != '/' && c != ':' && c != ';') {
+        for op in input.to_lowercase().split(|c: char| c.is_whitespace() || c == '\u{0}' || c == '\u{1}') {
             match op {
-                ":" if !found_open => found_open = true,
-                ";" if found_open => found_open = false,
-                word if found_open => {
-                    if found_word.is_empty() {
-                        found_word.push(word.to_owned());
-                    } else {
-                        self.word_defs.insert(found_word.clone().last().unwrap().to_owned(), word.into());
+                ":" if !found_open => {
+                    ops.push(":".to_owned());
+                    found_open = true;
+                },
+                ";" if found_open => {
+                    ops.push(";".to_owned());
+                    found_open = false;
+                },
+                word if !found_open && self.word_defs.contains_key(op) => {
+                    for translated_op in self.word_defs.clone().get_mut(word.into()).unwrap().to_owned().split_whitespace() {
+                        ops.push(translated_op.to_owned());
                     }
                 },
+                word => ops.push(word.to_owned())
+            }
+        }
+
+        println!("defs: {:?}", ops);
+
+        for op in ops {
+            println!("word: {:?}, {:?}", op, self.stack);
+
+            match op.as_str() {
+                ":" if !found_open => found_open = true,
+                ";" if found_open => {
+                    self.word_defs.insert(found_word.clone().last().unwrap().to_owned(), found_def.join(" "));
+                    found_open = false;
+                },
+                word if found_open && found_word.is_empty() && word.parse::<i32>().is_ok() => return Err(Error::InvalidWord),
+                word if found_open && found_word.is_empty() => found_word.push(word.to_owned()),
+                word if found_open => found_def.push(word.to_owned()),
                 "+" => {
                     match (self.stack.pop(), self.stack.pop()) {
                         (Some(b), Some(a)) => self.stack.push(a + b),
@@ -81,7 +104,7 @@ impl Forth {
                 },
                 "drop" => {
                     match self.stack.pop() {
-                        Some(a) => (),
+                        Some(_) => (),
                         None => return Err(Error::StackUnderflow)
                     }
                 },
@@ -105,7 +128,13 @@ impl Forth {
                     }
                 },
                 n if n.parse::<i32>().is_ok() => self.stack.push(n.parse::<i32>().unwrap()),
-                _ if !self.word_defs.contains_key(op) => return Err(Error::UnknownWord),
+                _ if self.word_defs.contains_key(&op) => {
+                    match self.eval(&op) {
+                        Ok(_) => (),
+                        Err(e) => return Err(e)
+                    }
+                },
+                _ if !self.word_defs.contains_key(&op) => return Err(Error::UnknownWord),
                 _ => return Err(Error::InvalidWord)
             }
         }
