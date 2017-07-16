@@ -36,7 +36,7 @@ impl <'a, T: Copy + PartialEq + 'a> Reactor<'a, T> {
         cell_id
     }
 
-    pub fn create_compute<F: Fn(&[T]) -> T + 'a>(&'a mut self, dependencies: &[CellID], compute_func: F) -> Result<CellID, ()> {
+    pub fn create_compute<F: Fn(&[T]) -> T + 'a>(&'a mut self, dependencies: &'a [CellID], compute_func: F) -> Result<CellID, ()> {
         if !dependencies.iter().all(|d| self.cells.contains_key(d)) {
             return Err(())
         }
@@ -55,7 +55,7 @@ impl <'a, T: Copy + PartialEq + 'a> Reactor<'a, T> {
         //let v = |_| { cell.compute_func.unwrap()(&cell.dependencies.into_iter().map(|d| self.cells.get(&d).unwrap().value).collect::<Vec<T>>()[..]); };
 
         for d in dependencies.iter().map(|a| *a).collect::<Vec<CellID>>() {
-            self.add_callback(d, |_| {
+            self.add_callback(d, move |_| {
                 let values = &dependencies.into_iter().map(|d| self.cells.get(&d).unwrap().value).collect::<Vec<T>>()[..];
                 compute_func(values);
             });
