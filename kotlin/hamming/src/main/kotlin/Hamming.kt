@@ -5,7 +5,7 @@ class Hamming {
                 throw IllegalArgumentException("leftStrand and rightStrand must be of equal length.")
             }
 
-            return sequence1.zip(sequence2).fold(0, { total, (a, b) -> total + if (a != b) 1 else 0 })
+            return sequence1.zip(sequence2).count { it.first != it.second }
         }
     }
 }
