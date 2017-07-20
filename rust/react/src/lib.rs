@@ -55,10 +55,10 @@ impl <'a, T: Copy + PartialEq + 'a> Reactor<'a, T> {
         //let v = |_| { cell.compute_func.unwrap()(&cell.dependencies.into_iter().map(|d| self.cells.get(&d).unwrap().value).collect::<Vec<T>>()[..]); };
 
         for d in dependencies.iter().map(|a| *a).collect::<Vec<CellID>>() {
-            self.add_callback(d, move |_| {
+            self.cells.get_mut(&d).unwrap().callbacks.insert(1, Box::new(move |_| {
                 let values = &dependencies.into_iter().map(|d| self.cells.get(&d).unwrap().value).collect::<Vec<T>>()[..];
                 compute_func(values);
-            });
+            }));
         }
 
         Ok(cell_id)

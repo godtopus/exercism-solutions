@@ -1,3 +1,6 @@
 [package]
 name = "dominoes"
 version = "1.0.1"
+
+[dependencies]
+permutohedron = "0.2"

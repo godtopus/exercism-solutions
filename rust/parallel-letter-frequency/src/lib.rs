@@ -1,43 +1,45 @@
-extern crate chashmap;
-
-use chashmap::CHashMap;
-use std::thread;
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::thread;
+use std::sync::mpsc::channel;
 
-pub fn frequency(sequence: &'static [&'static str], n_threads: usize) -> HashMap<char, u32> {
-    let counts: Arc<&CHashMap<char, u32>> = Arc::new(&CHashMap::new());
-    let n_threads = match sequence.len() {
-        0 => 1,
-        len if len < n_threads => sequence.len(),
-        _ => n_threads
-    };
+pub fn frequency(sequence: &[&str], n_threads: usize) -> HashMap<char, usize> {
+    let seq: Vec<Vec<String>> = sequence.iter()
+                                        .map(|s| (*s).to_string().to_lowercase())
+                                        .collect::<Vec<String>>()
+                                        .chunks(n_threads)
+                                        .map(|s| s.iter().map(|s| s.to_string()).collect::<Vec<String>>())
+                                        .collect();
 
-    let mut s = sequence.into_iter().map(|s| (*s).to_owned()).collect::<Vec<String>>();
-    count(sequence, &mut counts.clone(), n_threads);
+    let mut handles = Vec::new();
+    let (tx, rx) = channel();
 
-    counts.into_iter().collect()
+    for chunk in seq {
+        let tx = tx.clone();
+        handles.push(thread::spawn(move || {
+            tx.send(count(&chunk)).unwrap();
+        }));
+    }
+
+    let mut results: HashMap<char, usize> = HashMap::new();
+    for _ in 0..handles.len() {
+        for (c, n) in rx.recv().unwrap().into_iter() {
+            *results.entry(c).or_insert(0) += n;
+        }
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    results
 }
 
-fn count<'a>(sequence: &'static [&'static str], counts: &'a mut Arc<&'a CHashMap<char, u32>>, n_threads: usize) {
-    let mut threads = Vec::with_capacity(n_threads);
+fn count(sequence: &Vec<String>) -> HashMap<char, usize> {
+    let mut results: HashMap<char, usize> = HashMap::new();
 
-    for window in sequence.chunks(n_threads) {
-        //let counts = counts.clone();
-        //let window = window.to_owned().clone();
-
-        let f = |cnt : &'a Arc<&'a CHashMap<char, u32>>, w: &'a [&'a str]| {
-            for s in window.iter() {
-                for c in (*s).to_lowercase().chars().filter(|c| c.is_alphabetic()) {
-                    cnt.upsert(c, || 1, |e| *e += 1);
-                }
-            }
-        };
-
-        threads.push(thread::spawn(move || f(&counts, window)));
+    for c in sequence.concat().chars().filter(|c| c.is_alphabetic()) {
+        *results.entry(c).or_insert(0) += 1;
     }
 
-    for thread in threads {
-        thread.join().unwrap();
-    }
+    results
 }
