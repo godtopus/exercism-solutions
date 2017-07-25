@@ -8,3 +8,9 @@ enum class Allergen(val score: Int) {
     POLLEN(64),
     CATS(128)
 }
+
+class Allergies(val score: Int) {
+    fun isAllergicTo(allergen: Allergen) = score and allergen.score == allergen.score
+
+    fun getList() = listOf(Allergen.EGGS, Allergen.PEANUTS, Allergen.SHELLFISH, Allergen.STRAWBERRIES, Allergen.TOMATOES, Allergen.CHOCOLATE, Allergen.POLLEN, Allergen.CATS).filter { isAllergicTo(it) }
+}

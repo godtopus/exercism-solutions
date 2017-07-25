@@ -30,7 +30,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testBinaryToSingleDecimal() {
         val baseConverter = BaseConverter(2, intArrayOf(1, 0, 1))
@@ -44,7 +43,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testSingleDecimalToBinary() {
         val baseConverter = BaseConverter(10, intArrayOf(5))
@@ -58,7 +56,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testBinaryToMultipleDecimal() {
         val baseConverter = BaseConverter(2, intArrayOf(1, 0, 1, 0, 1, 0))
@@ -72,7 +69,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testDecimalToBinary() {
         val baseConverter = BaseConverter(10, intArrayOf(4, 2))
@@ -86,7 +82,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testTrinaryToHexadecimal() {
         val baseConverter = BaseConverter(3, intArrayOf(1, 1, 2, 0))
@@ -100,7 +95,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testHexadecimalToTrinary() {
         val baseConverter = BaseConverter(16, intArrayOf(2, 10))
@@ -114,7 +108,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun test15BitInteger() {
         val baseConverter = BaseConverter(97, intArrayOf(3, 46, 60))
@@ -128,7 +121,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testEmptyDigits() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -137,7 +129,6 @@ class BaseConverterTest {
         BaseConverter(2, intArrayOf())
     }
 
-    @Ignore
     @Test
     fun testSingleZero() {
         val baseConverter = BaseConverter(10, intArrayOf(0))
@@ -151,7 +142,6 @@ class BaseConverterTest {
             actualDigits)
     }
 
-    @Ignore
     @Test
     fun testMultipleZeros() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -160,7 +150,6 @@ class BaseConverterTest {
         BaseConverter(10, intArrayOf(0, 0, 0))
     }
 
-    @Ignore
     @Test
     fun testLeadingZeros() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -169,7 +158,6 @@ class BaseConverterTest {
         BaseConverter(7, intArrayOf(0, 6, 0))
     }
 
-    @Ignore
     @Test
     fun testNegativeDigit() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -178,7 +166,6 @@ class BaseConverterTest {
         BaseConverter(2, intArrayOf(1, -1, 1, 0, 1, 0))
     }
 
-    @Ignore
     @Test
     fun testInvalidPositiveDigit() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -187,7 +174,6 @@ class BaseConverterTest {
         BaseConverter(2, intArrayOf(1, 2, 1, 0, 1, 0))
     }
 
-    @Ignore
     @Test
     fun testFirstBaseIsOne() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -196,7 +182,6 @@ class BaseConverterTest {
         BaseConverter(1, intArrayOf())
     }
 
-    @Ignore
     @Test
     fun testSecondBaseIsOne() {
         val baseConverter = BaseConverter(2, intArrayOf(1, 0, 1, 0, 1, 0))
@@ -207,7 +192,6 @@ class BaseConverterTest {
         baseConverter.convertToBase(1)
     }
 
-    @Ignore
     @Test
     fun testFirstBaseIsZero() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -216,7 +200,6 @@ class BaseConverterTest {
         BaseConverter(0, intArrayOf())
     }
 
-    @Ignore
     @Test
     fun testSecondBaseIsZero() {
         val baseConverter = BaseConverter(2, intArrayOf(1, 0, 1, 0, 1, 0))
@@ -227,7 +210,6 @@ class BaseConverterTest {
         baseConverter.convertToBase(0)
     }
 
-    @Ignore
     @Test
     fun testFirstBaseIsNegative() {
         expectedException.expect(IllegalArgumentException::class.java)
@@ -236,7 +218,6 @@ class BaseConverterTest {
         BaseConverter(-2, intArrayOf())
     }
 
-    @Ignore
     @Test
     fun testSecondBaseIsNegative() {
         val baseConverter = BaseConverter(2, intArrayOf(1))
